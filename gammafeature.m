@@ -3,9 +3,9 @@ function X = gammafeature(timesegment, f_s)
 %  
     
     NFFT = size(timesegment,2);
-    NW = 4;
-    bandstarts = 66:12:114;
-    bins = freqtobin(bandstarts, f_s, NFFT);
+    NW = 6;
+    bands = [66 114];
+    bins = freqtobin(bands, f_s, NFFT);
     psd = pmtm(timesegment, NW);
-    X = mean(psd(bins(1):bins(end)));
+    X = median(psd(bins(1):bins(end))); %!!!!!!!!!!!!!!
 end
