@@ -9,15 +9,16 @@ load('data/sub1_comp.mat');
 f_s = 1000;
 
 neighborhood = 4096; % Time area around a movement to sample data
-NFFT = 256;
+NFFT = 64;
 overlap = 0; % Percent overlap
 datalength = size(train_data, 1);
-samplesperhood = (neighborhood - NFFT*overlap)/(1-overlap);
+samplesperhood = (neighborhood - NFFT*overlap)/(NFFT*(1-overlap));
 deltaN = NFFT * (1 - overlap);
 channel = 43;
+channels = [1 40 43 21 42 23]; % 
 timeoffset = -50; % Offset from movement to brain activity
 finger = 1;
-M = 2; % number of features
+M = size(channels, 2); % number of features
 
 %%
 
@@ -51,7 +52,7 @@ for k=1:numpeaks
         if(en > datalength)
             break;
         end
-        X = multigammafeature(train_data(beg:en, :), f_s);
+        X = multigammafeature(train_data(beg:en, :), f_s, channels);
         n = (k-1)*samplesperhood + i;
         features(n, :) = X;
         t = beg + timeoffset;
@@ -82,6 +83,16 @@ r = corr(x,y)
 figure;
 plotyy(T, values, T, features);
 legend('values', 'features');
+
+%%
+% sweep offset
+T = T - timeoffset;
+
+for timeoffset = -100:10:100
+    Tx = T + timeoffset;
+    values = train_dg(T(T>0), finger);
+end
+
 %%
 
 % for c = 1:62
