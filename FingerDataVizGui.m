@@ -23,8 +23,8 @@ classdef FingerDataVizGui < handle
             obj.channel = channel;
             obj.f_s = f_s;
             obj.fig = figure;
-
-            maxval = size(train_data,1)/NFFT;
+            numchannels = size(train_data, 2);
+            maxval = floor(size(train_data,1)/NFFT);
             obj.slider = uicontrol('Style', 'slider', 'Min',1,'Max',maxval, ...
                                    'Value',1, 'Units', 'normalized', 'Position', ...
                                    [0 0 1 .05], 'SliderStep', [1/maxval .05], ...
@@ -35,6 +35,20 @@ classdef FingerDataVizGui < handle
                                 obj.edit_n_callback(src, event)});
             uicontrol('Style', 'text', 'String', num2str(maxval), 'Units', 'normalized', ...
                       'Position', [0.9 .05 .1 .05]);
+            uicontrol('Style', 'text', 'String', 'Finger', 'Units', 'normalized', ...
+                      'Position', [0 .95 .1 .05]);
+
+            uicontrol('Style', 'popup', 'Units', 'normalized', ...
+                      'String', '1|2|3|4|5', 'Position', [0 0.9 0.1 0.05],...
+                      'Callback', {@(src, event) obj.set_finger(src, event)}); 
+            
+            uicontrol('Style', 'text', 'String', 'Channel', 'Units', 'normalized', ...
+                      'Position', [0.9 .95 .1 .05]);
+                        
+            uicontrol('Style', 'popup', 'Units', 'normalized', ...
+                      'String', 1:numchannels', 'Position', [0.9 0.9 0.1 0.05],...
+                      'Callback', {@(src, event) obj.set_channel(src, event)}); 
+                        
         end
         
         function paint_gui(obj)
@@ -51,6 +65,18 @@ classdef FingerDataVizGui < handle
         
     end
     methods (Access=private)
+        function set_finger(obj, src, event)
+            val = get(src, 'Value');
+            obj.finger = val;
+            obj.paint_gui();
+        end
+
+        function set_channel(obj, src, event)
+            val = get(src, 'Value');
+            obj.channel = val;
+            obj.paint_gui();
+        end
+
         function edit_n_callback(obj, src, event)
             str = get(src, 'String');
             val = str2num(str);
