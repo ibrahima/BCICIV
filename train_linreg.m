@@ -10,11 +10,15 @@ f_s = 1000;
 
 neighborhood = 4096; % Time area around a movement to sample data
 NFFT = 256;
-samplesperhood = neighborhood/NFFT;
+overlap = 0; % Percent overlap
+datalength = size(train_data, 1);
+samplesperhood = (neighborhood - NFFT*overlap)/(1-overlap);
+deltaN = NFFT * (1 - overlap);
 channel = 43;
 timeoffset = -50; % Offset from movement to brain activity
 finger = 1;
 M = 2; % number of features
+
 %%
 
 % Let's just look at channel 39 and 43 to start with
@@ -40,11 +44,13 @@ T = zeros(1, numpeaks*samplesperhood);
 for k=1:numpeaks
     from = idxs(k)-neighborhood/2;
     to = idxs(k) + neighborhood/2-1;
-    % TODO: Make this use multiple channels
     
     for i = 1:samplesperhood
-        beg = from + (i-1)*NFFT;
-        en = from + i*NFFT - 1;
+        beg = from + (i-1)*deltaN;
+        en = beg + NFFT - 1;
+        if(en > datalength)
+            break;
+        end
         X = multigammafeature(train_data(beg:en, :), f_s);
         n = (k-1)*samplesperhood + i;
         features(n, :) = X;
