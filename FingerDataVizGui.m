@@ -11,6 +11,7 @@ classdef FingerDataVizGui < handle
         edit_n
         from = 1
         to = 256
+        maxlabel
     end
     
     methods
@@ -33,7 +34,7 @@ classdef FingerDataVizGui < handle
             obj.edit_n = uicontrol('Style', 'edit', 'String','1', 'Units', 'normalized', ...
                                    'Position', [0 .05 .1 .05], 'Callback', {@(src, event) ...
                                 obj.edit_n_callback(src, event)});
-            uicontrol('Style', 'text', 'String', num2str(maxval), 'Units', 'normalized', ...
+            obj.maxlabel = uicontrol('Style', 'text', 'String', num2str(maxval), 'Units', 'normalized', ...
                       'Position', [0.9 .05 .1 .05]);
             uicontrol('Style', 'text', 'String', 'Finger', 'Units', 'normalized', ...
                       'Position', [0 .95 .1 .05]);
@@ -48,7 +49,13 @@ classdef FingerDataVizGui < handle
             uicontrol('Style', 'popup', 'Units', 'normalized', ...
                       'String', 1:numchannels', 'Position', [0.9 0.9 0.1 0.05],...
                       'Callback', {@(src, event) obj.set_channel(src, event)}); 
-                        
+
+            uicontrol('Style', 'text', 'String', 'NFFT', 'Units', 'normalized', ...
+                      'Position', [0 .8 .1 .05]);
+
+            uicontrol('Style', 'edit', 'String',obj.NFFT, 'Units', 'normalized', ...
+                                   'Position', [0 .75 .1 .05], 'Callback', {@(src, event) ...
+                                obj.set_NFFT(src, event)});
         end
         
         function paint_gui(obj)
@@ -74,6 +81,17 @@ classdef FingerDataVizGui < handle
         function set_channel(obj, src, event)
             val = get(src, 'Value');
             obj.channel = val;
+            obj.paint_gui();
+        end
+        
+        function set_NFFT(obj, src, event)
+            str = get(src, 'String');
+            val = str2num(str);           
+            obj.NFFT = val;
+            obj.to = obj.from + obj.NFFT- 1;
+            maxval = floor(size(obj.train_data,1)/obj.NFFT);
+            set(obj.slider, 'Max', maxval);
+            set(obj.maxlabel, 'String', num2str(maxval));
             obj.paint_gui();
         end
 
