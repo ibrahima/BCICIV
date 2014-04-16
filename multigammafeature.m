@@ -1,11 +1,10 @@
-function X = multigammafeature(timesegment, f_s)
+function X = multigammafeature(timesegment, f_s, channels)
 % MULTIGAMMAFEATURE - Calculates a feature vector based on gamma
 % band power, multiple channels
 %  
 % timesegment is an N x M matrix, where M is the number of channels
 % and N is the length of the timeseries
 
-    channels = [1 43]; % Magic constants - TODO: Change
     bands = [66 114];
     X = zeros(size(channels));
     for k = 1:size(channels, 2);

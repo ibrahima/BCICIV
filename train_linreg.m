@@ -9,14 +9,14 @@ load('data/sub1_comp.mat');
 f_s = 1000;
 
 neighborhood = 4096; % Time area around a movement to sample data
-NFFT = 64;
-overlap = 0; % Percent overlap
+NFFT = 256;
+overlap = .875; % Percent overlap
 datalength = size(train_data, 1);
 samplesperhood = (neighborhood - NFFT*overlap)/(NFFT*(1-overlap));
 deltaN = NFFT * (1 - overlap);
 channel = 43;
 channels = [1 40 43 21 42 23]; % 
-timeoffset = -50; % Offset from movement to brain activity
+timeoffset = 50; % Offset from movement to brain activity
 finger = 1;
 M = size(channels, 2); % number of features
 
@@ -65,7 +65,7 @@ end
 x = [features];
 y = values;
 
-b = (x' * x)\x'*y;
+b = pinv(x' * x)*x'*y;
 
 yhat = x*b;
 figure;
@@ -87,11 +87,48 @@ legend('values', 'features');
 %%
 % sweep offset
 T = T - timeoffset;
-
-for timeoffset = -100:10:100
+blah=0;
+foo2=0;
+i=1;
+offsetsweep = -300:10:300;
+for timeoffset = offsetsweep
     Tx = T + timeoffset;
-    values = train_dg(T(T>0), finger);
+    values = train_dg(Tx, finger);
+    rrr = sum(abs( corr (features,values)));
+    
+    x = [features];
+    y = values;
+
+    b = pinv(x' * x)*x'*y;
+
+    yhat = x*b;
+
+    blah(i) = rrr;
+    foo(i) = corr(yhat, y);
+    i = i + 1;
 end
+
+figure;
+plot(offsetsweep, blah);
+figure;
+plot(offsetsweep, foo);
+title('correlation between prediction and actual')
+%%
+Tx = T + 270;
+values = train_dg(Tx, finger);
+
+x = [features];
+y = values;
+
+b = pinv(x' * x)*x'*y;
+
+yhat = x*b;
+figure;
+hold all;
+plot(y, '-+');
+plot(yhat, '--o');
+yresid = yhat - y;
+ydemean = y - mean(y);
 
 %%
 
@@ -103,3 +140,25 @@ end
 %     rho = corr(feats, vals);
 %     fprintf('Channel %d: rho=%f\n', c, rho);
 % end
+
+
+%%
+
+Ta = 1:40:(datalength-40);
+allfeatures = zeros(size(Ta,2), M);
+nn = 1;
+for t=Ta
+
+    beg = t;
+    en = beg + NFFT - 1;
+    if(en > datalength)
+        break;
+    end
+    X = multigammafeature(train_data(beg:en, :), f_s, channels);
+    allfeatures(nn, :) = X;
+    nn = nn + 1;
+end
+
+values = train_dg(Ta, finger);
+
+yallhat = features*b;
