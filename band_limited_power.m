@@ -19,7 +19,7 @@ NFFT = 256;
 NW = 4;
 % gamma band = 66 to 114ish
 minfreq = 66;
-maxfreq = 114;
+maxfreq = 200;
 minbin = int32(NFFT/2*(minfreq/(f_s/2))+1);
 maxbin = int32(NFFT/2*(maxfreq/(f_s/2))+1);
 
@@ -67,3 +67,6 @@ boxplot(psds(minbin:maxbin, :), 'datalim', [0 1E6], 'extrememode', ...
         'clip');
 
 savefig(gcf, finger);
+
+figure;
+plot(mean(psds(minbin:maxbin,:),1));

@@ -14,6 +14,6 @@ function X = multigammafeature(timesegment, f_s, channels)
 
         bins = freqtobin(bands, f_s, NFFT);
         psd = pmtm(timesegment(:, channel), NW);
-        X(k) = median(psd(bins(1):bins(end))); %!!!!!!!!!!!!!!
+        X(k) = mean(psd(bins(1):bins(end))); %!!!!!!!!!!!!!!
     end
 end

@@ -51,3 +51,6 @@ for k=1:numpeaks
         T(n) = t;
     end
 end
+
+%% Train EM
+% m_1 = s^b_c * B + s^g_c

@@ -1,4 +1,4 @@
-function X = psdfeature(timesegment, f_s, channels)
+function X = psdfeature(timesegment, f_s, channels, NW)
 % MULTIGAMMAFEATURE - Calculates a feature vector based on gamma
 % band power, multiple channels
 %  
@@ -12,12 +12,10 @@ function X = psdfeature(timesegment, f_s, channels)
     for k = 1:numchannels;
         channel = channels(k);
         NFFT = size(timesegment,1);
-        NW = 6;
-
         bins = freqtobin(bands, f_s, NFFT);
         psd = pmtm(timesegment(:, channel), NW);
         for b = 1:numbands
-            X(b, k) = mean(psd(bins(b,1):bins(b,2))); %!!!!!!!!!!!!!!
+            X(b, k) = mean(psd(bins(b,1):bins(b,2)));
         end
     end
 end

@@ -16,12 +16,12 @@ numchannels = size(train_data, 2);
 samplesperhood = (neighborhood - NFFT*overlap)/(NFFT*(1-overlap));
 deltaN = NFFT * (1 - overlap);
 channel = 43;
-channels = [1 40 43 21 42 23]; % 
+channels = 1:numchannels;
 timeoffset = 50; % Offset from movement to brain activity
 finger = 1;
 M = size(channels, 2); % number of features
 
-windowlen = 40;
+windowlen = 100;
 %% Preprocessing
 
 % % Calculate common average over time
@@ -55,42 +55,42 @@ end
 % for k = 1:windowlen:(datalength-windowlen)
 % end
 
-%% EM-like algorithm
+% foo    
 
-% consider channel 1, 40
+%% Do some regressions, cross validate
 
-% observations
-M_L_1 = m_l_features(:, 1);
-M_L_2 = m_l_features(:, 2);
+% regress channel 1 beta against others
+X = m_l_features(:, 2:end);
+Y = m_l_features(:, 1);
 
-M_H_1 = m_h_features(:, 1);
-M_H_2 = m_h_features(:, 2);
+[b, mse] = ls_mse (X, Y);
 
-% Initialize hidden vars
-G_1 = M_H_1;
-G_2 = M_H_2;
-B = mean(m_l_features(:,1:2), 2);
+% regress channel 1 beta against gamma
 
-S_B_1 = 1;
-S_G_1 = 1;
+[b1, mse1] = ls_mse(m_l_features(:, 1), m_h_features(:,1));
 
-S_B_2 = 1;
-S_G_2 = 1;
+load('data/sub1_testlabels.mat');
+%% Cross validation
+fprintf(['| Channel | MSE | Max coeff channel | Max ' ...
+         'coefficient |\n']);
+fprintf(['|---------+-----+-------------------+-----------------|\' ...
+         'n']);
+Bs = 0;
+nfold = 10;
+for channel = 1:numchannels
+    Y = m_l_features(:, channel);
+    X = m_l_features;
+    X(:, channel) = []; % Delete the column for the channel
+    cross_val_length = round(featurelen/nfold);
 
-for l = 1:100
-    % 'E' step
-    G_1 = M_H_1/S_G_1;
-    G_2 = M_H_2/S_G_2;
-    
-    B = ((M_L_1 - S_G_1*G_1)./S_B_1 + (M_L_2 - S_G_2*G_2)./S_B_2)/2;
-    
-    % 'M' step
-    % This is quite clearly broken
-    S_B_1 = mean((M_L_1 - S_G_1*G_1)./B);
-    S_B_2 = mean((M_L_2 - S_G_2*G_2)./B);
-    
-    S_G_1 = mean((M_H_1 - S_B_1*B)./G_1);
-    S_G_2 = mean((M_H_2 - S_B_2*B)./G_2);
-    S_G_1
+    Y = Y(1:(featurelen-cross_val_length), :);
+    X = X(1:(featurelen-cross_val_length), :);
+    xval_X = X((featurelen-cross_val_length+1):end, :);
+    xval_Y = Y((featurelen-cross_val_length+1):end, :);
+    [b, mse] = ls_mse(X, Y);
+    %Bs(:, channel) = b
+    [maxb, maxi] = max(b);
+    xval_yhat = xval_X*b;
+    cross_val_mse = (xval_yhat-xval_Y).^2/cross_val_length
+    fprintf('| %d | %.2e | %d | %.2f |\n', channel, cross_val_mse, maxi, maxb);
 end
-    
