@@ -64,7 +64,7 @@ classdef FingerDataVizGui < handle
             psd = pmtm(obj.train_data(obj.from:obj.to, obj.channel) );
             timedata = obj.train_dg(obj.from:obj.to, obj.finger)';
             npsd = size(psd,1);
-            [ax,h1,h2] = plotyy((1:npsd)/npsd*1000/2, psd, 1:(obj.NFFT), ...
+            [ax,h1,h2] = plotyy((1:npsd)/npsd*1000/2, 10*log10(psd), 1:(obj.NFFT), ...
                                 timedata);
             set(ax(2), 'ylim', [-1 7]);
             set(ax(2), 'YTick', -1:7);
