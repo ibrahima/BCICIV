@@ -21,7 +21,7 @@ for t = 1:featurelen % Calculate features at each point in time
     to = from + windowlen - 1;
     
     window = train_data(from:to, :);
-    X = psdfeature(window, f_s, channels, NW);
+    X = psdfeature(window, f_s, channels, NW, NFFT);
     m_l_features(t, :) = X(1, :);
     m_h_features(t, :) = X(2, :);
     if mod(t, round(featurelen/100)) == 0
@@ -31,7 +31,7 @@ for t = 1:featurelen % Calculate features at each point in time
     if mod(t, round(featurelen/10)) == 0
         tTenPercent = toc(tStart);
         tStart = tic;
-        fprintf(' - %d seconds\n', tTenPercent)
+        fprintf(' - %.1f seconds\n', tTenPercent)
     end
 end
 features = struct('low_features', m_l_features, 'high_features', ...
