@@ -43,6 +43,6 @@ for t = 1:featurelen % Calculate features at each point in time
 end
 features = struct('low_features', m_l_features, 'high_features', ...
                   m_h_features, 'psd_features', psd_features, 'NW', NW, 'windowlen', windowlen, ...
-                  'overlap', overlap);
+                  'overlap', overlap, 'NFFT', NFFT, 'f_s', f_s);
 
 end
