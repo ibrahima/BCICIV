@@ -10,9 +10,9 @@ function [X, psds] = psdfeature(timesegment, f_s, channels, NW, NFFT)
     numchannels = size(channels, 2);
     X = zeros(numbands, numchannels);
     psds = zeros(numchannels, NFFT/2+1);
+    bins = freqtobin(bands, f_s, NFFT);
     for k = 1:numchannels;
         channel = channels(k);
-        bins = freqtobin(bands, f_s, NFFT);
         [psd, f] = pmtm(timesegment(:, channel), NW, NFFT, f_s);
         % TODO Use f instead of freqtobin
         psds(k,:) = psd';
