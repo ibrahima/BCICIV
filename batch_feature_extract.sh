@@ -17,6 +17,7 @@ for windowlen in "${windows[@]}"; do
             (( c+= 1))
             matlab -nojvm -nodisplay -nosplash -r "fx_gen('$datafile', $windowlen, $NW, 1000, $overlap, $NFFT, $channels);quit" &
             if ! (( c % corecount)); then
+                echo "Reached $corecount tasks in this loop, waiting"
                 # Wait on children so as not to overload the machine
                 wait
             fi

@@ -14,6 +14,6 @@ function fx_gen(datafile, windowlen, NW, f_s, overlap, NFFT, channels)
     T = feature_times(datalength, windowlen, overlap);
     outfile = sprintf('%s_features_w%d_NW%.1f_o%d_NFFT%d_c%d.mat', datafile, windowlen, NW, ...
                  round(overlap*100), NFFT, numchannels);
-    save(outfile);
+    save(outfile, '-v7.3');
     fprintf('Feature extraction completed, saved to %s', outfile);
 end
