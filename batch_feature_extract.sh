@@ -12,7 +12,7 @@ for windowlen in "${windows[@]}"; do
     for overlap in "${overlaps[@]}"; do
         echo "overlap = $overlap"
         for NW in "${NWs[@]}"; do
-            matlab -nodisplay -nosplash -r "fx_gen('$datafile', $windowlen, $NW, 1000, $overlap, $NFFT, $channels);quit" &
+            matlab -nojvm -nodisplay -nosplash -r "fx_gen('$datafile', $windowlen, $NW, 1000, $overlap, $NFFT, $channels);quit" &
         done
         # Wait on children so as not to overload the machine
         wait
